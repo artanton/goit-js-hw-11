@@ -98,7 +98,7 @@ function createMarkUp(pixabayHits) {
     })
     .join('');
 };
-// console.log(pixabayHits);
+
 
 const BASE_URL = 'https://pixabay.com/api/';
 const KEY = '39839865-cab33150dc8a84cb79ec8f421';
@@ -113,9 +113,11 @@ async function fetchQuery() {
     page: currentPage,
     per_page: perPage,
   });
-  return resp =  await axios.get(`${BASE_URL}?${params}`).then(response => {
-    return response.data;
-  });
+  // const response =  await axios.get(`${BASE_URL}?${params}`).then(response => {
+  //   return response.data;
+  // });
+  const response = await axios.get(`${BASE_URL}?${params}`);
+  return response.data;
 }
 
 let observer = new IntersectionObserver(onLoad, options);
