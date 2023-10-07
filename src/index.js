@@ -5,7 +5,9 @@ const refs = {
   form: document.querySelector('#search-form'),
   input: document.querySelector('input[name="searchQuery"]'),
   submitBtn: document.querySelector('button[type="submit"]'),
+
   observerTarg: document.querySelector('.js-guard'),
+
   gallery: document.querySelector('.gallery'),
   photoCards: document.querySelectorAll('.photo-card'),
   galleryImages: document.querySelectorAll('img'),
@@ -13,15 +15,17 @@ const refs = {
   infoItem: document.querySelector('.info-item'),
 };
 
+let pixabayHits=[];
 const perPage = 40;
+let isLoading = false;
 let query = '';
+
 let currentPage = 1;
 let options = {
   root: null,
   rootMargin: '300px',
   threshold: 1.0,
 };
-let isLoading = false;
 
 refs.form.addEventListener('submit', onSubmit);
 refs.form.addEventListener('input', onInput);
@@ -30,6 +34,7 @@ function onInput(event) {
   query = String(event.target.value).trim();
 }
 
+
 function onSubmit(e) {
   e.preventDefault();
   if (isLoading) {
@@ -37,8 +42,10 @@ function onSubmit(e) {
   }
   if (query !== '') {
     isLoading = true;
+    
     fetchQuery()
       .then(data => {
+        pixabayHits=data.hits
         isLoading = false;
         if (data.hits.length === 0) {
           Notiflix.Notify.failure(
@@ -50,8 +57,8 @@ function onSubmit(e) {
           );
 
           refs.gallery.innerHTML = '';
-          const markUp = createMarkUp(data.hits);
-          console.log(data);
+          const markUp = createMarkUp(pixabayHits);
+          // console.log(data);
           refs.gallery.insertAdjacentHTML('beforeend', markUp);
           observer.observe(refs.observerTarg);
         }
@@ -65,8 +72,8 @@ function onSubmit(e) {
   }
 }
 
-function createMarkUp() {
-  return hits
+function createMarkUp(pixabayHits) {
+  return pixabayHits
     .map(hit => {
       const {
         webformatURL,
@@ -90,12 +97,13 @@ function createMarkUp() {
   `;
     })
     .join('');
-}
+};
+// console.log(pixabayHits);
 
 const BASE_URL = 'https://pixabay.com/api/';
 const KEY = '39839865-cab33150dc8a84cb79ec8f421';
 
-function fetchQuery() {
+async function fetchQuery() {
   const params = new URLSearchParams({
     key: KEY,
     q: query,
@@ -105,7 +113,7 @@ function fetchQuery() {
     page: currentPage,
     per_page: perPage,
   });
- return axios.get(`${BASE_URL}?${params}`).then(response => {
+  return resp =  await axios.get(`${BASE_URL}?${params}`).then(response => {
     return response.data;
   });
 }
