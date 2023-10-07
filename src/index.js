@@ -95,7 +95,7 @@ function createMarkUp(hits) {
 const BASE_URL = 'https://pixabay.com/api/';
 const KEY = '39839865-cab33150dc8a84cb79ec8f421';
 
-async function fetchQuery() {
+function fetchQuery() {
   const params = new URLSearchParams({
     key: KEY,
     q: query,
@@ -105,7 +105,7 @@ async function fetchQuery() {
     page: currentPage,
     per_page: perPage,
   });
-  const response = await axios.get(`${BASE_URL}?${params}`).then(response => {
+ return axios.get(`${BASE_URL}?${params}`).then(response => {
     return response.data;
   });
 }
