@@ -49,7 +49,7 @@ function onSubmit(e) {
             `Hooray! We found totalHits ${data.totalHits} images.`
           );
 
-          refs.gallery.innerHTML = "";
+          refs.gallery.innerHTML = '';
           const markUp = createMarkUp(data.hits);
           console.log(data);
           refs.gallery.insertAdjacentHTML('beforeend', markUp);
@@ -63,7 +63,6 @@ function onSubmit(e) {
   } else {
     Notiflix.Notify.info('Enter a query, the field must not be empty.');
   }
-
 }
 
 function createMarkUp(hits) {
@@ -96,7 +95,7 @@ function createMarkUp(hits) {
 const BASE_URL = 'https://pixabay.com/api/';
 const KEY = '39839865-cab33150dc8a84cb79ec8f421';
 
-function fetchQuery() {
+async function fetchQuery() {
   const params = new URLSearchParams({
     key: KEY,
     q: query,
@@ -106,7 +105,7 @@ function fetchQuery() {
     page: currentPage,
     per_page: perPage,
   });
-  return axios.get(`${BASE_URL}?${params}`).then(response => {
+  const response = await axios.get(`${BASE_URL}?${params}`).then(response => {
     return response.data;
   });
 }
@@ -122,20 +121,15 @@ function onLoad(entries, observer) {
           refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
           if (currentPage > Math.ceil(total_pages)) {
             observer.unobserve(refs.observerTarg);
-            Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+            Notiflix.Notify.info(
+              "We're sorry, but you've reached the end of search results."
+            );
           }
         })
         .catch(error => console.log(error));
     }
   });
 }
-
-// fetchQuery()
-//   .then((data) => {
-//     refs.gallery.insertAdjacentHTML("beforeend", createMarkUp(data.hits));
-//     observer.observe(refs.observerTarg);
-//   })
-//   .catch((err) => console.log(err));
 
 refs.galleryImages.forEach(img => {
   img.style.width = '200px';
@@ -148,23 +142,3 @@ refs.gallery.style.gap = '20px';
 refs.photoCards.forEach(card => {
   card.style.width = 'calc(25% - 10px)';
 });
-// refs.photoInfo.forEach(infoEl=>{infoEl.style.display = "flex";})
-
-// function makeSelectOptions() {
-//   fetchBreeds()
-//     .then(data => {
-//       refs.error.style.display = 'none';
-//       const selectMarkup = data
-//         .map(breed => {
-//           return `<option value=${breed.id}>${breed.name}</option>`;
-//         })
-//         .join(' ');
-//       refs.select.insertAdjacentHTML('beforeend', selectMarkup);
-//       refs.loader.style.display = 'none';
-//       refs.select.style.display = 'block';
-//     })
-//     .catch(error => {
-//       console.log(error);
-//       return (refs.error.style.display = 'block');
-//     });
-// }
