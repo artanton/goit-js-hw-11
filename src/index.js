@@ -40,6 +40,7 @@ function onSubmit(e) {
   if (isLoading) {
     return;
   }
+  refs.gallery.innerHTML = '';
   if (query !== '') {
     isLoading = true;
     
@@ -47,7 +48,7 @@ function onSubmit(e) {
       .then(data => {
         pixabayHits=data.hits
         isLoading = false;
-        if (data.hits.length === 0) {
+        if (pixabayHits.length === 0) {
           Notiflix.Notify.failure(
             'Sorry, there are no images matching your search query. Please try again.'
           );
@@ -56,7 +57,7 @@ function onSubmit(e) {
             `Hooray! We found totalHits ${data.totalHits} images.`
           );
 
-          refs.gallery.innerHTML = '';
+          
           const markUp = createMarkUp(pixabayHits);
           // console.log(data);
           refs.gallery.insertAdjacentHTML('beforeend', markUp);
@@ -113,7 +114,7 @@ async function fetchQuery() {
     page: currentPage,
     per_page: perPage,
   });
-  // const response =  await axios.get(`${BASE_URL}?${params}`).then(response => {
+  // axios.get(`${BASE_URL}?${params}`).then(response => {
   //   return response.data;
   // });
   const response = await axios.get(`${BASE_URL}?${params}`);
@@ -131,9 +132,10 @@ function onLoad(entries, observer) {
           refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
           if (currentPage > Math.ceil(total_pages)) {
             observer.unobserve(refs.observerTarg);
+            if(pixabayHits.length !== 0){
             Notiflix.Notify.info(
               "We're sorry, but you've reached the end of search results."
-            );
+            );}
           }
         })
         .catch(error => console.log(error));
