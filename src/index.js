@@ -65,7 +65,7 @@ function onSubmit(e) {
   }
 }
 
-function createMarkUp(hits) {
+function createMarkUp() {
   return hits
     .map(hit => {
       const {
