@@ -87,12 +87,12 @@ function createMarkUp(pixabayHits) {
       } = hit;
       return `
     <div class="photo-card">
-      <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+      <img class= "item-image" src="${webformatURL}" alt="${tags}" loading="lazy" />
       <div class="info">
-        <p class="info-item"><b>Likes</b>: ${likes}</p>
-        <p class="info-item"><b>Views</b>: ${views}</p>
-        <p class="info-item"><b>Comments</b>: ${comments}</p>
-        <p class="info-item"><b>Downloads</b>: ${downloads}</p>
+        <p class="info-item"><b>Likes</b>${likes} </p>
+        <p class="info-item"><b>Views</b> ${views}</p>
+        <p class="info-item"><b>Comments</b> ${comments}</p>
+        <p class="info-item"><b>Downloads</b> ${downloads}</p>
       </div>
     </div>
   `;
@@ -143,14 +143,6 @@ function onLoad(entries, observer) {
   });
 }
 
-refs.galleryImages.forEach(img => {
-  img.style.width = '200px';
-});
 
-refs.gallery.style.display = 'flex';
-refs.gallery.style.flexWrap = 'wrap';
-refs.gallery.style.gap = '20px';
 
-refs.photoCards.forEach(card => {
-  card.style.width = 'calc(25% - 10px)';
-});
+// let lightbox = new SimpleLightbox('.gallery a');
