@@ -69,7 +69,7 @@ function onSubmit(e) {
         console.log(error);
       });
   } else {
-    Notiflix.Notify.info('Enter a query, the field must not be empty.');
+    Notiflix.Notify.failure('Enter a query, the field must not be empty.');
   }
 }
 
