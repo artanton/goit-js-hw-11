@@ -1,6 +1,9 @@
 import axios from 'axios';
 import Notiflix from 'notiflix';
 
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
+
 const refs = {
   form: document.querySelector('#search-form'),
   input: document.querySelector('input[name="searchQuery"]'),
@@ -10,12 +13,12 @@ const refs = {
 
   gallery: document.querySelector('.gallery'),
   photoCards: document.querySelectorAll('.photo-card'),
-  galleryImages: document.querySelectorAll('img'),
-  photoInfo: document.querySelectorAll('.info'),
-  infoItem: document.querySelector('.info-item'),
+ 
 };
 
+// let lightbox = new SimpleLightbox('.gallery a');
 let pixabayHits=[];
+let total_pages =0;
 const perPage = 40;
 let isLoading = false;
 let query = '';
@@ -30,6 +33,31 @@ let options = {
 refs.form.addEventListener('submit', onSubmit);
 refs.form.addEventListener('input', onInput);
 
+let observer = new IntersectionObserver(onLoad, options);
+function onLoad(entries, observer) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      currentPage += 1;
+      fetchQuery(currentPage)
+        .then(data => {
+          total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
+         
+
+          refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
+          // simpleLightbox.refresh();
+          if (currentPage===Math.ceil(total_pages)) {
+            observer.unobserve(refs.observerTarg);
+            if(pixabayHits.length !== 0){
+            Notiflix.Notify.info(
+              "We're sorry, but you've reached the end of search results."
+            );}
+          }
+        })
+        .catch(error => console.log(error));
+    }
+  });
+}
+
 function onInput(event) {
   query = String(event.target.value).trim();
 }
@@ -37,6 +65,7 @@ function onInput(event) {
 
 function onSubmit(e) {
   e.preventDefault();
+  currentPage = 1;
   if (isLoading) {
     return;
   }
@@ -57,11 +86,18 @@ function onSubmit(e) {
             `Hooray! We found totalHits ${data.totalHits} images.`
           );
 
-          
+        
           const markUp = createMarkUp(pixabayHits);
-          // console.log(data);
           refs.gallery.insertAdjacentHTML('beforeend', markUp);
-          observer.observe(refs.observerTarg);
+          // simpleLightbox.refresh();
+          total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
+          if (currentPage<Math.ceil(total_pages)){
+            observer.observe(refs.observerTarg);
+            
+          }
+            console.log(Math.ceil(total_pages));
+
+          
         }
       })
       .catch(error => {
@@ -86,6 +122,7 @@ function createMarkUp(pixabayHits) {
         downloads,
       } = hit;
       return `
+      <a class="big-photo" href="${largeImageURL}">
     <div class="photo-card">
       <img class= "item-image" src="${webformatURL}" alt="${tags}" loading="lazy" />
       <div class="info">
@@ -95,6 +132,7 @@ function createMarkUp(pixabayHits) {
         <p class="info-item"><b>Downloads</b> ${downloads}</p>
       </div>
     </div>
+    </a>
   `;
     })
     .join('');
@@ -121,28 +159,9 @@ async function fetchQuery() {
   return response.data;
 }
 
-let observer = new IntersectionObserver(onLoad, options);
-function onLoad(entries, observer) {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      currentPage += 1;
-      fetchQuery(currentPage)
-        .then(data => {
-          let total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
-          refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
-          if (currentPage > Math.ceil(total_pages)) {
-            observer.unobserve(refs.observerTarg);
-            if(pixabayHits.length !== 0){
-            Notiflix.Notify.info(
-              "We're sorry, but you've reached the end of search results."
-            );}
-          }
-        })
-        .catch(error => console.log(error));
-    }
-  });
-}
 
 
 
-// let lightbox = new SimpleLightbox('.gallery a');
+
+
+
