@@ -20,7 +20,7 @@ const refs = {
 let pixabayHits=[];
 let total_pages =0;
 const perPage = 40;
-let isLoading = false;
+// let isLoading = false;
 let query = '';
 
 let currentPage = 1;
@@ -30,33 +30,12 @@ let options = {
   threshold: 1.0,
 };
 
+let observer = new IntersectionObserver(onLoad, options);
+
 refs.form.addEventListener('submit', onSubmit);
 refs.form.addEventListener('input', onInput);
 
-let observer = new IntersectionObserver(onLoad, options);
-function onLoad(entries, observer) {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      currentPage += 1;
-      fetchQuery(currentPage)
-        .then(data => {
-          total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
-         
 
-          refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
-          // simpleLightbox.refresh();
-          if (currentPage===Math.ceil(total_pages)) {
-            observer.unobserve(refs.observerTarg);
-            if(pixabayHits.length !== 0){
-            Notiflix.Notify.info(
-              "We're sorry, but you've reached the end of search results."
-            );}
-          }
-        })
-        .catch(error => console.log(error));
-    }
-  });
-}
 
 function onInput(event) {
   query = String(event.target.value).trim();
@@ -66,18 +45,21 @@ function onInput(event) {
 function onSubmit(e) {
   e.preventDefault();
   currentPage = 1;
-  if (isLoading) {
-    currentPage = 1;
-    return;
-  }
+  let total_pages =0;
+  observer.unobserve(refs.observerTarg);
+  // if (isLoading) {
+    
+  //   return;
+  // }
   refs.gallery.innerHTML = '';
   if (query !== '') {
-    isLoading = true;
+    // isLoading = true;
     
     fetchQuery()
       .then(data => {
         pixabayHits=data.hits
-        isLoading = false;
+        console.log(data);
+        // isLoading = false;
         if (pixabayHits.length === 0) {
           Notiflix.Notify.failure(
             'Sorry, there are no images matching your search query. Please try again.'
@@ -92,17 +74,24 @@ function onSubmit(e) {
           refs.gallery.insertAdjacentHTML('beforeend', markUp);
           // simpleLightbox.refresh();
           total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
-          if (currentPage<Math.ceil(total_pages)){
-            observer.observe(refs.observerTarg);
+          console.log(Math.ceil(total_pages));
+          
+
+          
+
+          if (currentPage < Math.ceil(total_pages)){
+            observer.observe(refs.observerTarg);}
             
-          }
-            console.log(Math.ceil(total_pages));
+          
+
+         
+           
 
           
         }
       })
       .catch(error => {
-        isLoading = false;
+        // isLoading = false;
         console.log(error);
       });
   } else {
@@ -133,6 +122,7 @@ function createMarkUp(pixabayHits) {
         <p class="info-item"><b>Downloads</b> ${downloads}</p>
       </div>
     </div>
+    
     </a>
   `;
     })
@@ -153,13 +143,36 @@ async function fetchQuery() {
     page: currentPage,
     per_page: perPage,
   });
-  // axios.get(`${BASE_URL}?${params}`).then(response => {
+  // return axios.get(`${BASE_URL}?${params}`).then(response => {
   //   return response.data;
   // });
   const response = await axios.get(`${BASE_URL}?${params}`);
   return response.data;
 }
 
+function onLoad(entries, observer) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      currentPage += 1;
+      fetchQuery(currentPage)
+        .then(data => {
+          total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
+         
+
+          refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
+          // simpleLightbox.refresh();
+          if (currentPage>=Math.ceil(total_pages)) {
+            observer.unobserve(refs.observerTarg);
+            if(pixabayHits.length !== 0){
+            Notiflix.Notify.info(
+              "We're sorry, but you've reached the end of search results."
+            );}
+          }
+        })
+        .catch(error => console.log(error));
+    }
+  });
+}
 
 
 
