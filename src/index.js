@@ -76,7 +76,6 @@ function dataHendler() {
   fetchQuery()
     .then(data => {
       pixabayHits = data.hits;
-      console.log(data);
 
       if (pixabayHits.length === 0) {
         Notiflix.Notify.failure(
@@ -91,7 +90,6 @@ function dataHendler() {
         refs.gallery.insertAdjacentHTML('beforeend', markUp);
         lightbox.refresh();
         total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
-        console.log(Math.ceil(total_pages));
 
         if (currentPage < Math.ceil(total_pages)) {
           observer.observe(refs.observerTarg);
@@ -132,8 +130,6 @@ function createMarkUp(pixabayHits) {
     .join('');
 }
 
-
-
 function onLoad(entries, observer) {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -143,7 +139,7 @@ function onLoad(entries, observer) {
           total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
 
           refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
-         lightbox.refresh();
+          lightbox.refresh();
           if (currentPage >= Math.ceil(total_pages)) {
             observer.unobserve(refs.observerTarg);
             if (pixabayHits.length !== 0) {
