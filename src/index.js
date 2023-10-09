@@ -65,6 +65,7 @@ function onInput(event) {
 
 function onSubmit(e) {
   e.preventDefault();
+  currentPage = 1;
   if (isLoading) {
     currentPage = 1;
     return;
