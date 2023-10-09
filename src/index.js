@@ -37,8 +37,7 @@ function onInput(event) {
 
 function onSubmit(e) {
   e.preventDefault();
-  currentPage = 1;
-  if (isLoading) {
+    if (isLoading) {
     return;
   }
   refs.gallery.innerHTML = '';
@@ -131,7 +130,7 @@ function onLoad(entries, observer) {
         .then(data => {
           let total_pages = Math.ceil(Number(data.totalHits) / Number(perPage));
           refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
-          if (currentPage === Math.ceil(total_pages)) {
+          if (currentPage > Math.ceil(total_pages)) {
             observer.unobserve(refs.observerTarg);
             if(pixabayHits.length !== 0){
             Notiflix.Notify.info(
